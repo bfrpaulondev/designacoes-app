@@ -1,53 +1,35 @@
-# dependencies
-node_modules
-.pnp
-.pnp.js
-.yarn/install-state.gz
+# Dependencies
+node_modules/
 
-# testing
-coverage
-
-# next.js
+# Build outputs
+dist/
+build/
 .next/
-out/
 
-# production
-build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env*.local
+# Environment files
 .env
+.env.local
+.env.*.local
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# logs
+# Logs
 *.log
-dev.log
-server.log
+npm-debug.log*
 
-# database
-db/
-*.db
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
 
-# prisma
-prisma/
+# OS
+.DS_Store
+Thumbs.db
 
-# mini services
-mini-services/*/node_modules
+# Uploads
+upload/
 
-# zscripts
-.zscripts/
+# Misc
+.accesslog
+.stats
+.mini-services/
+.download/
