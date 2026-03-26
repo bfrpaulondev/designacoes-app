@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import {
   Box,
   Card,
-  CardContent,
   Typography,
   Button,
   Table,
@@ -31,9 +30,8 @@ import {
   Delete as DeleteIcon,
   MoreVert as MoreVertIcon,
   Publish as PublishIcon,
-  Visibility as ViewIcon,
 } from '@mui/icons-material'
-import axios from 'axios'
+import api from '../api'
 
 interface Semana {
   id: string
@@ -64,7 +62,7 @@ export default function Semanas() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const res = await axios.get('/api/semanas')
+      const res = await api.get('/semanas')
       setSemanas(res.data.semanas || [])
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao carregar dados')
@@ -109,11 +107,11 @@ export default function Semanas() {
       setSaving(true)
 
       if (editingSemana) {
-        await axios.put(`/api/semanas/${editingSemana.id}`, {
+        await api.put(`/semanas/${editingSemana.id}`, {
           observacoes: formData.observacoes
         })
       } else {
-        await axios.post('/api/semanas', formData)
+        await api.post('/semanas', formData)
       }
 
       handleCloseDialog()
@@ -129,7 +127,7 @@ export default function Semanas() {
     if (!confirm('Tem certeza que deseja excluir esta semana e todas as suas designações?')) return
     
     try {
-      await axios.delete(`/api/semanas/${id}`)
+      await api.delete(`/semanas/${id}`)
       loadData()
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao excluir')
@@ -138,7 +136,7 @@ export default function Semanas() {
 
   const handlePublish = async (id: string) => {
     try {
-      await axios.put(`/api/semanas/${id}`, { status: 'publicado' })
+      await api.put(`/semanas/${id}`, { status: 'publicado' })
       loadData()
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao publicar')

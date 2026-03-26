@@ -26,7 +26,6 @@ import {
   Map as MapIcon,
   Settings as SettingsIcon,
   Logout as LogoutIcon,
-  Login as LoginIcon,
 } from '@mui/icons-material'
 import Login from './pages/Login'
 import Publicadores from './pages/Publicadores'

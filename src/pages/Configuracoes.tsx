@@ -11,7 +11,7 @@ import {
   Grid,
   Divider,
 } from '@mui/material'
-import axios from 'axios'
+import api from '../api'
 
 interface Config {
   nomeCongregacao: string
@@ -39,7 +39,7 @@ export default function Configuracoes() {
   const loadConfig = async () => {
     try {
       setLoading(true)
-      const res = await axios.get('/api/config')
+      const res = await api.get('/config')
       if (res.data.config) {
         setConfig({
           nomeCongregacao: res.data.config.nomeCongregacao || '',
@@ -61,7 +61,7 @@ export default function Configuracoes() {
       setError('')
       setSuccess('')
 
-      await axios.post('/api/config', config)
+      await api.post('/config', config)
       setSuccess('Configurações salvas com sucesso!')
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao salvar configurações')
@@ -94,7 +94,7 @@ export default function Configuracoes() {
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Nome da Congregação"
@@ -102,7 +102,7 @@ export default function Configuracoes() {
                 onChange={(e) => setConfig({ ...config, nomeCongregacao: e.target.value })}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Email da Congregação"
@@ -111,7 +111,7 @@ export default function Configuracoes() {
                 onChange={(e) => setConfig({ ...config, emailCongregacao: e.target.value })}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Telefone do Salão"
@@ -119,7 +119,7 @@ export default function Configuracoes() {
                 onChange={(e) => setConfig({ ...config, telefoneSalao: e.target.value })}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Endereço do Salão"

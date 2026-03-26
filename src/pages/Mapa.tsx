@@ -10,9 +10,8 @@ import {
   MenuItem,
   Alert,
   CircularProgress,
-  Chip,
 } from '@mui/material'
-import axios from 'axios'
+import api from '../api'
 
 interface Publicador {
   id: string
@@ -47,15 +46,15 @@ export default function Mapa() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const res = await axios.get('/api/publicadores')
+      const res = await api.get('/publicadores')
       const allPubs = res.data.publicadores || []
       
       // Filtrar apenas os que têm coordenadas
-      const comCoords = allPubs.filter((p: any) => p.latitude && p.longitude)
+      const comCoords = allPubs.filter((p: Publicador) => p.latitude && p.longitude)
       setPublicadores(comCoords)
 
       // Extrair grupos únicos
-      const gruposUnicos = [...new Set(allPubs.map((p: any) => p.grupoCampo).filter(Boolean))]
+      const gruposUnicos = [...new Set(allPubs.map((p: Publicador) => p.grupoCampo).filter(Boolean))] as string[]
       setGrupos(gruposUnicos.sort())
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao carregar dados')

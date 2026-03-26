@@ -26,7 +26,6 @@ import {
   MenuItem,
   Grid,
   Fab,
-  Tooltip,
   Alert,
   CircularProgress,
   Avatar,
@@ -39,14 +38,11 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Search as SearchIcon,
-  FilterList as FilterIcon,
-  Map as MapIcon,
-  Label as LabelIcon,
   MoreVert as MoreVertIcon,
   Male as MaleIcon,
   Female as FemaleIcon,
 } from '@mui/icons-material'
-import axios from 'axios'
+import api from '../api'
 
 interface Publicador {
   id: string
@@ -105,8 +101,8 @@ export default function Publicadores() {
     try {
       setLoading(true)
       const [pubRes, etqRes] = await Promise.all([
-        axios.get('/api/publicadores'),
-        axios.get('/api/etiquetas')
+        api.get('/publicadores'),
+        api.get('/etiquetas')
       ])
       setPublicadores(pubRes.data.publicadores || [])
       setEtiquetas(etqRes.data.etiquetas || [])
@@ -187,9 +183,9 @@ export default function Publicadores() {
       }
 
       if (editingPublicador) {
-        await axios.put(`/api/publicadores/${editingPublicador.id}`, data)
+        await api.put(`/publicadores/${editingPublicador.id}`, data)
       } else {
-        await axios.post('/api/publicadores', data)
+        await api.post('/publicadores', data)
       }
 
       handleCloseDialog()
@@ -205,7 +201,7 @@ export default function Publicadores() {
     if (!confirm('Tem certeza que deseja excluir este publicador?')) return
     
     try {
-      await axios.delete(`/api/publicadores/${id}`)
+      await api.delete(`/publicadores/${id}`)
       loadData()
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao excluir')
@@ -271,7 +267,7 @@ export default function Publicadores() {
       <Card sx={{ mb: 2 }}>
         <CardContent>
           <Grid container spacing={2} alignItems="center">
-            <Grid size={{ xs: 12, md: 4 }}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
                 placeholder="Buscar por nome, email ou telefone..."
@@ -286,7 +282,7 @@ export default function Publicadores() {
                 }}
               />
             </Grid>
-            <Grid size={{ xs: 6, md: 2 }}>
+            <Grid item xs={6} md={2}>
               <FormControl fullWidth>
                 <InputLabel>Status</InputLabel>
                 <Select
@@ -302,7 +298,7 @@ export default function Publicadores() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 6, md: 2 }}>
+            <Grid item xs={6} md={2}>
               <FormControl fullWidth>
                 <InputLabel>Gênero</InputLabel>
                 <Select
@@ -316,7 +312,7 @@ export default function Publicadores() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
+            <Grid item xs={12} md={4}>
               <Typography variant="body2" color="text.secondary">
                 {filteredPublicadores.length} publicadores encontrados
               </Typography>
@@ -434,7 +430,7 @@ export default function Publicadores() {
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Primeiro Nome"
@@ -443,7 +439,7 @@ export default function Publicadores() {
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Último Nome"
@@ -452,7 +448,7 @@ export default function Publicadores() {
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Email"
@@ -461,7 +457,7 @@ export default function Publicadores() {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Telemóvel"
@@ -469,7 +465,7 @@ export default function Publicadores() {
                 onChange={(e) => setFormData({ ...formData, telemovel: e.target.value })}
               />
             </Grid>
-            <Grid size={{ xs: 6, md: 4 }}>
+            <Grid item xs={6} md={4}>
               <FormControl fullWidth>
                 <InputLabel>Gênero</InputLabel>
                 <Select
@@ -482,7 +478,7 @@ export default function Publicadores() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 6, md: 4 }}>
+            <Grid item xs={6} md={4}>
               <FormControl fullWidth>
                 <InputLabel>Tipo</InputLabel>
                 <Select
@@ -498,7 +494,7 @@ export default function Publicadores() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 6, md: 4 }}>
+            <Grid item xs={6} md={4}>
               <FormControl fullWidth>
                 <InputLabel>Privilégio</InputLabel>
                 <Select
@@ -513,7 +509,7 @@ export default function Publicadores() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Morada"
@@ -521,7 +517,7 @@ export default function Publicadores() {
                 onChange={(e) => setFormData({ ...formData, morada: e.target.value })}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Cidade"
@@ -529,7 +525,7 @@ export default function Publicadores() {
                 onChange={(e) => setFormData({ ...formData, cidade: e.target.value })}
               />
             </Grid>
-            <Grid size={{ xs: 6, md: 3 }}>
+            <Grid item xs={6} md={3}>
               <TextField
                 fullWidth
                 label="Latitude"
@@ -538,7 +534,7 @@ export default function Publicadores() {
                 onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
               />
             </Grid>
-            <Grid size={{ xs: 6, md: 3 }}>
+            <Grid item xs={6} md={3}>
               <TextField
                 fullWidth
                 label="Longitude"
@@ -547,7 +543,7 @@ export default function Publicadores() {
                 onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
               />
             </Grid>
-            <Grid size={{ xs: 6, md: 3 }}>
+            <Grid item xs={6} md={3}>
               <TextField
                 fullWidth
                 label="Grupo Campo"
@@ -555,7 +551,7 @@ export default function Publicadores() {
                 onChange={(e) => setFormData({ ...formData, grupoCampo: e.target.value })}
               />
             </Grid>
-            <Grid size={{ xs: 6, md: 3 }}>
+            <Grid item xs={6} md={3}>
               <TextField
                 fullWidth
                 label="Grupo Limpeza"
@@ -563,7 +559,7 @@ export default function Publicadores() {
                 onChange={(e) => setFormData({ ...formData, grupoLimpeza: e.target.value })}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <FormControl fullWidth>
                 <InputLabel>Status</InputLabel>
                 <Select
@@ -579,7 +575,7 @@ export default function Publicadores() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid item xs={12} md={6}>
               <FormControl fullWidth>
                 <InputLabel>Etiquetas</InputLabel>
                 <Select
@@ -601,7 +597,7 @@ export default function Publicadores() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12 }}>
+            <Grid item xs={12}>
               <TextField
                 fullWidth
                 label="Observações"

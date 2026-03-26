@@ -9,7 +9,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material'
-import axios from 'axios'
+import api from '../api'
 
 interface LoginProps {
   onLogin: (token: string, user: any) => void
@@ -27,7 +27,7 @@ export default function Login({ onLogin }: LoginProps) {
     setError('')
 
     try {
-      const response = await axios.post('/api/auth/login', { email, password })
+      const response = await api.post('/auth/login', { email, password })
       onLogin(response.data.token, response.data.user)
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao fazer login')

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import {
   Box,
   Card,
-  CardContent,
   Table,
   TableBody,
   TableCell,
@@ -20,13 +19,17 @@ import {
   Alert,
   CircularProgress,
   Chip,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from '@mui/material'
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material'
-import axios from 'axios'
+import api from '../api'
 
 interface Etiqueta {
   id: string
@@ -72,7 +75,7 @@ export default function Etiquetas() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const res = await axios.get('/api/etiquetas')
+      const res = await api.get('/etiquetas')
       setEtiquetas(res.data.etiquetas || [])
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao carregar etiquetas')
@@ -118,9 +121,9 @@ export default function Etiquetas() {
       }
 
       if (editingEtiqueta) {
-        await axios.put(`/api/etiquetas/${editingEtiqueta.id}`, data)
+        await api.put(`/etiquetas/${editingEtiqueta.id}`, data)
       } else {
-        await axios.post('/api/etiquetas', data)
+        await api.post('/etiquetas', data)
       }
 
       handleCloseDialog()
@@ -136,7 +139,7 @@ export default function Etiquetas() {
     if (!confirm('Tem certeza que deseja excluir esta etiqueta?')) return
     
     try {
-      await axios.delete(`/api/etiquetas/${id}`)
+      await api.delete(`/etiquetas/${id}`)
       loadData()
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao excluir')
@@ -262,19 +265,20 @@ export default function Etiquetas() {
                 sx={{ mt: 1 }}
               />
             </Box>
-            <TextField
-              fullWidth
-              select
-              label="Ícone"
-              value={formData.icone}
-              onChange={(e) => setFormData({ ...formData, icone: e.target.value })}
-            >
-              {ICONES_PREDEFINIDOS.map((icone) => (
-                <MenuItem key={icone} value={icone}>
-                  {icone}
-                </MenuItem>
-              ))}
-            </TextField>
+            <FormControl fullWidth>
+              <InputLabel>Ícone</InputLabel>
+              <Select
+                value={formData.icone}
+                label="Ícone"
+                onChange={(e) => setFormData({ ...formData, icone: e.target.value })}
+              >
+                {ICONES_PREDEFINIDOS.map((icone) => (
+                  <MenuItem key={icone} value={icone}>
+                    {icone}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <TextField
               fullWidth
               label="Descrição"
