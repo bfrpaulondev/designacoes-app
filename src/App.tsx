@@ -43,6 +43,7 @@ import Etiquetas from './pages/Etiquetas'
 import MapaGrupos from './pages/MapaGrupos'
 import Semanas from './pages/Semanas'
 import Configuracoes from './pages/Configuracoes'
+import ConfiguracoesProgramacao from './pages/ConfiguracoesProgramacao'
 import Estatisticas from './pages/Estatisticas'
 import RelatoriosCampo from './pages/RelatoriosCampo'
 import Atividades from './pages/Atividades'
@@ -217,7 +218,7 @@ function App() {
       case 'ausencias':
         return <Ausencias />
       case 'config-programacao':
-        return <Configuracoes />
+        return <ConfiguracoesProgramacao />
       case 'estatisticas':
         return <Estatisticas />
       case 'semanas':
