@@ -37,6 +37,8 @@ import {
   Schedule as ScheduleIcon,
   Block as BlockIcon,
   AssignmentInd as AssignmentIndIcon,
+  Security as SecurityIcon,
+  AdminPanelSettings as AdminIcon,
 } from '@mui/icons-material'
 import { TiposProvider } from './contexts/TiposContext'
 import Login from './pages/Login'
@@ -54,6 +56,7 @@ import HistoricoDesignacoes from './pages/HistoricoDesignacoes'
 import ExportarDados from './pages/ExportarDados'
 import Programacao from './pages/Programacao'
 import Ausencias from './pages/Ausencias'
+import Privilegios from './pages/Privilegios'
 
 
 const drawerWidth = 260
@@ -145,6 +148,7 @@ function App() {
     { id: 'estatisticas', label: 'Estatísticas', icon: <ChartIcon /> },
     { id: 'semanas', label: 'Semanas', icon: <EventIcon /> },
     { id: 'exportar', label: 'Exportar Dados', icon: <DownloadIcon /> },
+    { id: 'privilegios', label: 'Privilégios', icon: <SecurityIcon /> },
     { id: 'configuracoes', label: 'Configurações', icon: <SettingsIcon /> },
   ]
 
@@ -231,6 +235,8 @@ function App() {
         return <Semanas />
       case 'exportar':
         return <ExportarDados />
+      case 'privilegios':
+        return <Privilegios />
       case 'configuracoes':
         return <Configuracoes />
       default:

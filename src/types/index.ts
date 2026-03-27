@@ -242,3 +242,198 @@ export const MESES = [
   { value: '11', label: 'Novembro' },
   { value: '12', label: 'Dezembro' },
 ]
+
+// ============================================
+// SISTEMA DE PRIVILÉGIOS
+// ============================================
+
+export type UserRole = 
+  | 'super_admin'
+  | 'admin'
+  | 'anciao'
+  | 'servo_ministerial'
+  | 'publicador'
+  | 'publicador_nao_batizado'
+  | 'convidado'
+
+export type Resource = 
+  | 'publicadores'
+  | 'designacoes'
+  | 'ausencias'
+  | 'semanas'
+  | 'etiquetas'
+  | 'configuracoes'
+  | 'usuarios'
+  | 'privilegios'
+  | 'relatorios'
+  | 'notificacoes'
+  | 'limpeza'
+  | 'testemunho_publico'
+  | 'av_indicadores'
+
+export type Action = 
+  | 'create'
+  | 'read'
+  | 'update'
+  | 'delete'
+  | 'export'
+  | 'import'
+  | 'manage'
+  | 'assign'
+  | 'approve'
+  | 'view_own'
+  | 'edit_own'
+
+export interface Permission {
+  resource: Resource
+  action: Action
+  conditions?: PermissionCondition[]
+}
+
+export interface PermissionCondition {
+  type: 'own_data' | 'own_group' | 'specific_ids' | 'time_range' | 'status'
+  value: any
+}
+
+export interface Role {
+  _id?: string
+  id: string
+  name: string
+  description: string
+  level: number
+  permissions: Permission[]
+  inheritsFrom?: string
+  isSystem: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface UserWithPrivileges {
+  _id?: string
+  id?: string
+  email: string
+  name: string
+  role: UserRole
+  roleName?: string
+  privilegioServico?: string
+  designacoesEspeciais?: string[]
+  customPermissions?: Permission[]
+  restrictions?: UserRestriction[]
+  managedGroups?: string[]
+  publicadorId?: string
+  isActive?: boolean
+  lastLogin?: string
+  preferences?: UserPreferences
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface UserRestriction {
+  type: 'time_based' | 'resource_based' | 'action_based' | 'group_based'
+  resource?: Resource
+  action?: Action
+  groupId?: string
+  startTime?: string
+  endTime?: string
+  reason?: string
+  appliedBy?: string
+  appliedAt: string
+  expiresAt?: string
+}
+
+export interface UserPreferences {
+  language: 'pt' | 'en' | 'es'
+  timezone: string
+  theme: 'light' | 'dark' | 'auto'
+  notifications: NotificationPreferences
+  dashboard: DashboardPreferences
+}
+
+export interface NotificationPreferences {
+  email: boolean
+  sms: boolean
+  whatsapp: boolean
+  newAssignment: boolean
+  assignmentReminder: boolean
+  absenceApproved: boolean
+  weeklySchedule: boolean
+  reminderDays: number
+}
+
+export interface DashboardPreferences {
+  defaultView: 'week' | 'month' | 'list'
+  showWeekend: boolean
+  showMidweek: boolean
+  showCleaning: boolean
+  showPublicWitnessing: boolean
+}
+
+export interface AuditLog {
+  _id?: string
+  id: string
+  userId: string
+  userName: string
+  action: string
+  resource: Resource
+  resourceId?: string
+  details: Record<string, any>
+  ipAddress: string
+  userAgent: string
+  timestamp: string
+}
+
+export interface PermissionRequest {
+  _id?: string
+  id: string
+  requestedBy: string
+  requestedRole?: UserRole
+  requestedPermissions?: Permission[]
+  reason: string
+  status: 'pending' | 'approved' | 'rejected'
+  reviewedBy?: string
+  reviewedAt?: string
+  reviewNotes?: string
+  createdAt: string
+  updatedAt: string
+}
+
+// Constantes para roles
+export const USER_ROLES: { value: UserRole; label: string; level: number }[] = [
+  { value: 'super_admin', label: 'Super Administrador', level: 100 },
+  { value: 'admin', label: 'Administrador', level: 90 },
+  { value: 'anciao', label: 'Ancião', level: 70 },
+  { value: 'servo_ministerial', label: 'Servo Ministerial', level: 50 },
+  { value: 'publicador', label: 'Publicador', level: 30 },
+  { value: 'publicador_nao_batizado', label: 'Publicador Não Batizado', level: 20 },
+  { value: 'convidado', label: 'Convidado', level: 10 },
+]
+
+export const RESOURCES: { value: Resource; label: string }[] = [
+  { value: 'publicadores', label: 'Publicadores' },
+  { value: 'designacoes', label: 'Designações' },
+  { value: 'ausencias', label: 'Ausências' },
+  { value: 'semanas', label: 'Semanas' },
+  { value: 'etiquetas', label: 'Etiquetas' },
+  { value: 'configuracoes', label: 'Configurações' },
+  { value: 'usuarios', label: 'Usuários' },
+  { value: 'privilegios', label: 'Privilégios' },
+  { value: 'relatorios', label: 'Relatórios' },
+  { value: 'notificacoes', label: 'Notificações' },
+  { value: 'limpeza', label: 'Limpeza' },
+  { value: 'testemunho_publico', label: 'Testemunho Público' },
+  { value: 'av_indicadores', label: 'AV e Indicadores' },
+]
+
+export const ACTIONS: { value: Action; label: string }[] = [
+  { value: 'create', label: 'Criar' },
+  { value: 'read', label: 'Visualizar' },
+  { value: 'update', label: 'Atualizar' },
+  { value: 'delete', label: 'Excluir' },
+  { value: 'export', label: 'Exportar' },
+  { value: 'import', label: 'Importar' },
+  { value: 'manage', label: 'Gerenciar (Total)' },
+  { value: 'assign', label: 'Atribuir' },
+  { value: 'approve', label: 'Aprovar' },
+  { value: 'view_own', label: 'Ver Próprios' },
+  { value: 'edit_own', label: 'Editar Próprios' },
+]
