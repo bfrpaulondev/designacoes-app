@@ -261,8 +261,9 @@ export default function Designacoes() {
         atualizadoEm: new Date().toISOString(),
       } as Designacao
 
-      await api.post('/designacoes', novaDesignacao)
-      setDesignacoes(prev => [...prev, novaDesignacao])
+      const response = await api.post('/designacoes', novaDesignacao)
+      const savedDesignacao = response.data.designacao || response.data || novaDesignacao
+      setDesignacoes(prev => [...prev, savedDesignacao])
       setDialogSugestoes(false)
       setSuccess('Designação adicionada!')
     } catch (err: any) {

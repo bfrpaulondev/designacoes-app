@@ -238,12 +238,13 @@ export default function Ausencias() {
       }
 
       if (editingAusencia) {
-        await api.put(`/ausencias/${editingAusencia.id}`, newAusencia)
-        setAusencias(prev => prev.map(a => a.id === editingAusencia.id ? { ...newAusencia, id: editingAusencia.id } : a))
+        const response = await api.put(`/ausencias/${editingAusencia.id}`, newAusencia)
+        const updatedAusencia = response.data.ausencia || response.data
+        setAusencias(prev => prev.map(a => a.id === editingAusencia.id ? updatedAusencia : a))
         setSnackbar({ message: 'Ausência atualizada com sucesso', type: 'success' })
       } else {
         const response = await api.post('/ausencias', newAusencia)
-        const savedAusencia = response.data
+        const savedAusencia = response.data.ausencia || response.data
         setAusencias(prev => [...prev, savedAusencia])
         setSnackbar({ message: 'Ausência criada com sucesso', type: 'success' })
       }
