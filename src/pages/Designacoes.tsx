@@ -24,6 +24,10 @@ import {
   Badge,
   useTheme,
   useMediaQuery,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import {
   Weekend as WeekendIcon,
@@ -101,10 +105,9 @@ export default function Designacoes() {
   const [dataSelecionada, setDataSelecionada] = useState<Date>(new Date())
   const [semanaInicio, setSemanaInicio] = useState<string>('')
 
-  // Dialogs (reservados para uso futuro)
-  const [_dialogDesignacao, _setDialogDesignacao] = useState(false)
+  // Dialogs
+  const [dialogDesignacao, setDialogDesignacao] = useState(false)
   const [dialogSugestoes, setDialogSugestoes] = useState(false)
-  const [_designacaoEditando, _setDesignacaoEditando] = useState<Designacao | null>(null)
   const [tipoDesignacaoAtual, setTipoDesignacaoAtual] = useState<TipoDesignacao | null>(null)
   const [sugestoesAtuais, setSugestoesAtuais] = useState<SugestaoDesignacao[]>([])
 
@@ -501,7 +504,7 @@ export default function Designacoes() {
                 startIcon={<AddIcon />}
                 onClick={() => {
                   setTipoDesignacaoAtual('presidente')
-                  _setDialogDesignacao(true)
+                  setDialogDesignacao(true)
                 }}
               >
                 Adicionar
@@ -536,7 +539,7 @@ export default function Designacoes() {
                 startIcon={<AddIcon />}
                 onClick={() => {
                   setTipoDesignacaoAtual('presidente')
-                  _setDialogDesignacao(true)
+                  setDialogDesignacao(true)
                 }}
               >
                 Adicionar
@@ -572,7 +575,7 @@ export default function Designacoes() {
                 startIcon={<AddIcon />}
                 onClick={() => {
                   setTipoDesignacaoAtual('som')
-                  _setDialogDesignacao(true)
+                  setDialogDesignacao(true)
                 }}
               >
                 Adicionar
@@ -618,7 +621,7 @@ export default function Designacoes() {
                 startIcon={<AddIcon />}
                 onClick={() => {
                   setTipoDesignacaoAtual('grupo_limpeza_a')
-                  _setDialogDesignacao(true)
+                  setDialogDesignacao(true)
                 }}
               >
                 Adicionar
@@ -754,6 +757,69 @@ export default function Designacoes() {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setDialogSugestoes(false)}>Fechar</Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Dialog de Nova Designação */}
+        <Dialog
+          open={dialogDesignacao}
+          onClose={() => setDialogDesignacao(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>
+            Adicionar Designação
+          </DialogTitle>
+          <DialogContent dividers>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel>Tipo de Designação</InputLabel>
+                  <Select
+                    value={tipoDesignacaoAtual || ''}
+                    label="Tipo de Designação"
+                    onChange={(e) => setTipoDesignacaoAtual(e.target.value as TipoDesignacao)}
+                  >
+                    {tabValue === 0 && Object.entries(TIPOS_FIM_SEMANA_LABELS).map(([key, value]) => (
+                      <MenuItem key={key} value={key}>{value.label}</MenuItem>
+                    ))}
+                    {tabValue === 1 && Object.entries(TIPOS_MEIO_SEMANA_LABELS).map(([key, value]) => (
+                      <MenuItem key={key} value={key}>{value.label}</MenuItem>
+                    ))}
+                    {tabValue === 2 && Object.entries(TIPOS_AV_LABELS).map(([key, value]) => (
+                      <MenuItem key={key} value={key}>{value.label}</MenuItem>
+                    ))}
+                    {tabValue === 3 && Object.entries(TIPOS_LIMPEZA_LABELS).map(([key, value]) => (
+                      <MenuItem key={key} value={key}>{value.label}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => {
+                    if (tipoDesignacaoAtual) {
+                      const categoria = tabValue === 0 ? 'fim_semana' : 
+                                       tabValue === 1 ? 'meio_semana' : 
+                                       tabValue === 2 ? 'av_indicadores' : 'limpeza'
+                      const data = tabValue === 0 ? getDataFimSemana(semanaInicio, config) : 
+                                  tabValue === 1 ? getDataMeioSemana(semanaInicio, config) : 
+                                  getDataFimSemana(semanaInicio, config)
+                      abrirSugestoes(tipoDesignacaoAtual, categoria, data)
+                      setDialogDesignacao(false)
+                    }
+                  }}
+                  disabled={!tipoDesignacaoAtual}
+                >
+                  Ver Sugestões de Publicadores
+                </Button>
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDialogDesignacao(false)}>Cancelar</Button>
           </DialogActions>
         </Dialog>
       </Box>
