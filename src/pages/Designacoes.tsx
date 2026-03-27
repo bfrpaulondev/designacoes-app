@@ -51,6 +51,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import ptBR from 'date-fns/locale/pt-BR'
 import { useTipos } from '../contexts/TiposContext'
 import { Ausencia, Publicador } from '../types/index'
+import { Designacao, TipoDesignacao, CategoriaDesignacao } from '../types/designacoes'
 import {
   gerarSugestoes,
   verificarDisponibilidade,
@@ -79,7 +80,7 @@ export default function Designacoes() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   
   // Obter tipos dinâmicos do contexto
-  const { tiposDesignacao, getTipoLabel: getTipoLabelFromContext, getStatusLabel: getStatusLabelFromContext, getStatusColor: getStatusColorFromContext, loading: loadingTipos } = useTipos()
+  const { tiposDesignacao, getTipoLabel: getTipoLabelFromContext, getStatusLabel: getStatusLabelFromContext, getStatusColor: getStatusColorFromContext } = useTipos()
 
   const [tabValue, setTabValue] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -218,8 +219,8 @@ export default function Designacoes() {
     const sugestoes = gerarSugestoes(
       publicadores,
       data,
-      tipo,
-      categoria,
+      tipo as TipoDesignacao,
+      categoria as CategoriaDesignacao,
       ausencias,
       designacoes,
       config
