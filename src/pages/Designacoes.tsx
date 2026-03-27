@@ -49,18 +49,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import ptBR from 'date-fns/locale/pt-BR'
-import {
-  Designacao,
-  CategoriaDesignacao,
-  TipoDesignacao,
-  StatusDesignacao,
-  SugestaoDesignacao,
-  TIPOS_FIM_SEMANA_LABELS,
-  TIPOS_MEIO_SEMANA_LABELS,
-  TIPOS_AV_LABELS,
-  TIPOS_LIMPEZA_LABELS,
-  STATUS_DESIGNACAO_LABELS,
-} from '../types/designacoes'
+import { useTipos } from '../contexts/TiposContext'
 import { Ausencia, Publicador } from '../types/index'
 import {
   gerarSugestoes,
@@ -88,6 +77,9 @@ function TabPanel(props: TabPanelProps) {
 export default function Designacoes() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  
+  // Obter tipos dinâmicos do contexto
+  const { tiposDesignacao, getTipoLabel: getTipoLabelFromContext, getStatusLabel: getStatusLabelFromContext, getStatusColor: getStatusColorFromContext, loading: loadingTipos } = useTipos()
 
   const [tabValue, setTabValue] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -99,7 +91,7 @@ export default function Designacoes() {
   const [publicadores, setPublicadores] = useState<Publicador[]>([])
   const [ausencias, setAusencias] = useState<Ausencia[]>([])
   const [config, setConfig] = useState<ConfiguracoesSistema>(CONFIGURACOES_PADRAO)
-  const [designacoes, setDesignacoes] = useState<Designacao[]>([])
+  const [designacoes, setDesignacoes] = useState<any[]>([])
 
   // Filtros
   const [dataSelecionada, setDataSelecionada] = useState<Date>(new Date())
@@ -108,8 +100,8 @@ export default function Designacoes() {
   // Dialogs
   const [dialogDesignacao, setDialogDesignacao] = useState(false)
   const [dialogSugestoes, setDialogSugestoes] = useState(false)
-  const [tipoDesignacaoAtual, setTipoDesignacaoAtual] = useState<TipoDesignacao | null>(null)
-  const [sugestoesAtuais, setSugestoesAtuais] = useState<SugestaoDesignacao[]>([])
+  const [tipoDesignacaoAtual, setTipoDesignacaoAtual] = useState<string | null>(null)
+  const [sugestoesAtuais, setSugestoesAtuais] = useState<any[]>([])
 
   useEffect(() => {
     loadData()
@@ -222,7 +214,7 @@ export default function Designacoes() {
   }
 
   // Abre dialog de sugestões
-  const abrirSugestoes = (tipo: TipoDesignacao, categoria: CategoriaDesignacao, data: string) => {
+  const abrirSugestoes = (tipo: string, categoria: string, data: string) => {
     const sugestoes = gerarSugestoes(
       publicadores,
       data,
@@ -238,28 +230,29 @@ export default function Designacoes() {
   }
 
   // Seleciona publicador da sugestão
-  const selecionarPublicador = async (sugestao: SugestaoDesignacao) => {
+  const selecionarPublicador = async (sugestao: any) => {
     if (!tipoDesignacaoAtual || !semanaInicio) return
 
     try {
       // Determina a data baseada na categoria
+      const tabCategoria = tabValue === 0 ? 'fim_semana' : 
+                          tabValue === 1 ? 'meio_semana' : 
+                          tabValue === 2 ? 'av_indicadores' : 'limpeza'
       const data = tabValue === 0 
         ? getDataFimSemana(semanaInicio, config)
         : getDataMeioSemana(semanaInicio, config)
 
-      const novaDesignacao: Designacao = {
+      const novaDesignacao: any = {
         id: `${data}_${tipoDesignacaoAtual}_${Date.now()}`,
         publicadorId: sugestao.publicadorId,
         publicadorNome: sugestao.publicadorNome,
         tipo: tipoDesignacaoAtual,
-        categoria: tabValue === 0 ? 'fim_semana' : 
-                   tabValue === 1 ? 'meio_semana' : 
-                   tabValue === 2 ? 'av_indicadores' : 'limpeza',
+        categoria: tabCategoria,
         data,
         status: 'pendente',
         criadoEm: new Date().toISOString(),
         atualizadoEm: new Date().toISOString(),
-      } as Designacao
+      }
 
       const response = await api.post('/designacoes', novaDesignacao)
       const savedDesignacao = response.data.designacao || response.data || novaDesignacao
@@ -302,27 +295,16 @@ export default function Designacoes() {
     return data.toISOString().split('T')[0]
   }
 
-  const getStatusColor = (status: StatusDesignacao) => {
-    return STATUS_DESIGNACAO_LABELS[status]?.cor || '#757575'
+  const getStatusColor = (status: string) => {
+    return getStatusColorFromContext(status)
   }
 
-  const getStatusLabel = (status: StatusDesignacao) => {
-    return STATUS_DESIGNACAO_LABELS[status]?.label || status
+  const getStatusLabel = (status: string) => {
+    return getStatusLabelFromContext(status)
   }
 
-  const getTipoLabel = (tipo: TipoDesignacao, categoria: CategoriaDesignacao) => {
-    switch (categoria) {
-      case 'fim_semana':
-        return TIPOS_FIM_SEMANA_LABELS[tipo as keyof typeof TIPOS_FIM_SEMANA_LABELS]?.label || tipo
-      case 'meio_semana':
-        return TIPOS_MEIO_SEMANA_LABELS[tipo as keyof typeof TIPOS_MEIO_SEMANA_LABELS]?.label || tipo
-      case 'av_indicadores':
-        return TIPOS_AV_LABELS[tipo as keyof typeof TIPOS_AV_LABELS]?.label || tipo
-      case 'limpeza':
-        return TIPOS_LIMPEZA_LABELS[tipo as keyof typeof TIPOS_LIMPEZA_LABELS]?.label || tipo
-      default:
-        return tipo
-    }
+  const getTipoLabel = (tipo: string, categoria: string) => {
+    return getTipoLabelFromContext(tipo, categoria)
   }
 
   const formatDate = (data: string) => {
@@ -332,7 +314,7 @@ export default function Designacoes() {
   }
 
   // Renderiza lista de designações
-  const renderDesignacaoItem = (designacao: Designacao) => {
+  const renderDesignacaoItem = (designacao: any) => {
     const { disponivel, motivo } = verificarDisponibilidade(
       designacao.publicadorId,
       designacao.data,
@@ -779,19 +761,19 @@ export default function Designacoes() {
                   <Select
                     value={tipoDesignacaoAtual || ''}
                     label="Tipo de Designação"
-                    onChange={(e) => setTipoDesignacaoAtual(e.target.value as TipoDesignacao)}
+                    onChange={(e) => setTipoDesignacaoAtual(e.target.value)}
                   >
-                    {tabValue === 0 && Object.entries(TIPOS_FIM_SEMANA_LABELS).map(([key, value]) => (
-                      <MenuItem key={key} value={key}>{value.label}</MenuItem>
+                    {tabValue === 0 && tiposDesignacao.fimSemana.map((t) => (
+                      <MenuItem key={t.id} value={t.id}>{t.label}</MenuItem>
                     ))}
-                    {tabValue === 1 && Object.entries(TIPOS_MEIO_SEMANA_LABELS).map(([key, value]) => (
-                      <MenuItem key={key} value={key}>{value.label}</MenuItem>
+                    {tabValue === 1 && tiposDesignacao.meioSemana.map((t) => (
+                      <MenuItem key={t.id} value={t.id}>{t.label}</MenuItem>
                     ))}
-                    {tabValue === 2 && Object.entries(TIPOS_AV_LABELS).map(([key, value]) => (
-                      <MenuItem key={key} value={key}>{value.label}</MenuItem>
+                    {tabValue === 2 && tiposDesignacao.avIndicadores.map((t) => (
+                      <MenuItem key={t.id} value={t.id}>{t.label}</MenuItem>
                     ))}
-                    {tabValue === 3 && Object.entries(TIPOS_LIMPEZA_LABELS).map(([key, value]) => (
-                      <MenuItem key={key} value={key}>{value.label}</MenuItem>
+                    {tabValue === 3 && tiposDesignacao.limpeza.map((t) => (
+                      <MenuItem key={t.id} value={t.id}>{t.label}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>

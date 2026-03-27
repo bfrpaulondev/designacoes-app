@@ -38,6 +38,7 @@ import {
   Block as BlockIcon,
   AssignmentInd as AssignmentIndIcon,
 } from '@mui/icons-material'
+import { TiposProvider } from './contexts/TiposContext'
 import Login from './pages/Login'
 import Publicadores from './pages/Publicadores'
 import Etiquetas from './pages/Etiquetas'
@@ -253,6 +254,7 @@ function App() {
   }
 
   return (
+    <TiposProvider>
     <Box sx={{ display: 'flex' }}>
       <AppBar
         position="fixed"
@@ -333,6 +335,7 @@ function App() {
         {renderContent()}
       </Box>
     </Box>
+    </TiposProvider>
   )
 }
 

@@ -46,8 +46,23 @@ export type TipoDesignacaoAV =
   | 'microfone_1'
   | 'microfone_2'
   | 'microfone_3'
+  | 'microfone_4'
+  | 'microfone_5'
+  | 'microfone_6'
+  | 'microfone_7'
+  | 'microfone_8'
+  | 'microfone_9'
+  | 'microfone_10'
   | 'indicador_1'
   | 'indicador_2'
+  | 'indicador_3'
+  | 'indicador_4'
+  | 'indicador_5'
+  | 'indicador_6'
+  | 'indicador_7'
+  | 'indicador_8'
+  | 'indicador_9'
+  | 'indicador_10'
   | 'plataforma'
   | 'zoom'
 
@@ -289,8 +304,23 @@ export const TIPOS_AV_LABELS: Record<TipoDesignacaoAV, { label: string; icon: st
   microfone_1: { label: 'Microfone 1', icon: '🎙️' },
   microfone_2: { label: 'Microfone 2', icon: '🎙️' },
   microfone_3: { label: 'Microfone 3', icon: '🎙️' },
+  microfone_4: { label: 'Microfone 4', icon: '🎙️' },
+  microfone_5: { label: 'Microfone 5', icon: '🎙️' },
+  microfone_6: { label: 'Microfone 6', icon: '🎙️' },
+  microfone_7: { label: 'Microfone 7', icon: '🎙️' },
+  microfone_8: { label: 'Microfone 8', icon: '🎙️' },
+  microfone_9: { label: 'Microfone 9', icon: '🎙️' },
+  microfone_10: { label: 'Microfone 10', icon: '🎙️' },
   indicador_1: { label: 'Indicador 1', icon: '👆' },
   indicador_2: { label: 'Indicador 2', icon: '👆' },
+  indicador_3: { label: 'Indicador 3', icon: '👆' },
+  indicador_4: { label: 'Indicador 4', icon: '👆' },
+  indicador_5: { label: 'Indicador 5', icon: '👆' },
+  indicador_6: { label: 'Indicador 6', icon: '👆' },
+  indicador_7: { label: 'Indicador 7', icon: '👆' },
+  indicador_8: { label: 'Indicador 8', icon: '👆' },
+  indicador_9: { label: 'Indicador 9', icon: '👆' },
+  indicador_10: { label: 'Indicador 10', icon: '👆' },
   plataforma: { label: 'Plataforma', icon: '🏛️' },
   zoom: { label: 'Assistente Zoom', icon: '💻' },
 }
@@ -334,9 +364,24 @@ export function tipoDesignacaoParaAusencia(tipo: TipoDesignacao, categoria: Cate
     case 'microfone_1':
     case 'microfone_2':
     case 'microfone_3':
+    case 'microfone_4':
+    case 'microfone_5':
+    case 'microfone_6':
+    case 'microfone_7':
+    case 'microfone_8':
+    case 'microfone_9':
+    case 'microfone_10':
       return 'microfone'
     case 'indicador_1':
     case 'indicador_2':
+    case 'indicador_3':
+    case 'indicador_4':
+    case 'indicador_5':
+    case 'indicador_6':
+    case 'indicador_7':
+    case 'indicador_8':
+    case 'indicador_9':
+    case 'indicador_10':
       return 'indicador'
     case 'som':
     case 'video':
