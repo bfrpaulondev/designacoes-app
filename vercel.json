@@ -3,6 +3,15 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
+    { "source": "/api/auth/login", "destination": "/api/auth/login" },
+    { "source": "/api/publicadores", "destination": "/api/publicadores" },
+    { "source": "/api/publicadores/:id*", "destination": "/api/publicadores" },
+    { "source": "/api/ausencias", "destination": "/api/ausencias" },
+    { "source": "/api/ausencias/:id*", "destination": "/api/ausencias" },
+    { "source": "/api/designacoes", "destination": "/api/designacoes" },
+    { "source": "/api/designacoes/:id*", "destination": "/api/designacoes" },
+    { "source": "/api/config-programacao", "destination": "/api/config-programacao" },
+    { "source": "/api/config", "destination": "/api/config" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
