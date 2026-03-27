@@ -36,6 +36,7 @@ import {
   TrendingUp as ActivityIcon,
   Schedule as ScheduleIcon,
   Block as BlockIcon,
+  AssignmentInd as AssignmentIndIcon,
 } from '@mui/icons-material'
 import Login from './pages/Login'
 import Publicadores from './pages/Publicadores'
@@ -44,6 +45,7 @@ import MapaGrupos from './pages/MapaGrupos'
 import Semanas from './pages/Semanas'
 import Configuracoes from './pages/Configuracoes'
 import ConfiguracoesProgramacao from './pages/ConfiguracoesProgramacao'
+import Designacoes from './pages/Designacoes'
 import Estatisticas from './pages/Estatisticas'
 import RelatoriosCampo from './pages/RelatoriosCampo'
 import Atividades from './pages/Atividades'
@@ -123,6 +125,7 @@ function App() {
       label: 'Programação', 
       icon: <ScheduleIcon />, 
       submenu: [
+        { id: 'designacoes', label: 'Designações', icon: <AssignmentIndIcon /> },
         { id: 'reuniao-semana', label: 'Reunião de Semana', icon: <EventIcon /> },
         { id: 'ausencias', label: 'Ausências', icon: <BlockIcon /> },
         { id: 'config-programacao', label: 'Configurações', icon: <SettingsIcon /> },
@@ -219,6 +222,8 @@ function App() {
         return <Ausencias />
       case 'config-programacao':
         return <ConfiguracoesProgramacao />
+      case 'designacoes':
+        return <Designacoes />
       case 'estatisticas':
         return <Estatisticas />
       case 'semanas':
