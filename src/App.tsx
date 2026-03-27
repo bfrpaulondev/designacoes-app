@@ -38,6 +38,7 @@ import {
   Block as BlockIcon,
   AssignmentInd as AssignmentIndIcon,
   Security as SecurityIcon,
+  Checklist as ChecklistIcon,
 } from '@mui/icons-material'
 import { TiposProvider } from './contexts/TiposContext'
 import Login from './pages/Login'
@@ -56,6 +57,7 @@ import ExportarDados from './pages/ExportarDados'
 import Programacao from './pages/Programacao'
 import Ausencias from './pages/Ausencias'
 import Privilegios from './pages/Privilegios'
+import Qualificacoes from './pages/Qualificacoes'
 
 
 const drawerWidth = 260
@@ -146,6 +148,7 @@ function App() {
     },
     { id: 'estatisticas', label: 'Estatísticas', icon: <ChartIcon /> },
     { id: 'semanas', label: 'Semanas', icon: <EventIcon /> },
+    { id: 'qualificacoes', label: 'Qualificações', icon: <ChecklistIcon /> },
     { id: 'exportar', label: 'Exportar Dados', icon: <DownloadIcon /> },
     { id: 'privilegios', label: 'Privilégios', icon: <SecurityIcon /> },
     { id: 'configuracoes', label: 'Configurações', icon: <SettingsIcon /> },
@@ -230,6 +233,8 @@ function App() {
         return <Designacoes />
       case 'estatisticas':
         return <Estatisticas />
+      case 'qualificacoes':
+        return <Qualificacoes />
       case 'semanas':
         return <Semanas />
       case 'exportar':
