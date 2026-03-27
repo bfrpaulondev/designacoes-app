@@ -38,7 +38,6 @@ import {
   Block as BlockIcon,
   AssignmentInd as AssignmentIndIcon,
   Security as SecurityIcon,
-  AdminPanelSettings as AdminIcon,
 } from '@mui/icons-material'
 import { TiposProvider } from './contexts/TiposContext'
 import Login from './pages/Login'

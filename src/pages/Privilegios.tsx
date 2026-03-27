@@ -15,7 +15,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Select,
   MenuItem,
   FormControl,
@@ -29,25 +28,17 @@ import {
   Tooltip,
   Alert,
   Snackbar,
-  Switch,
-  FormControlLabel,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   List,
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  Divider,
 } from '@mui/material'
 import {
   Add as AddIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon,
   Security as SecurityIcon,
   People as PeopleIcon,
   History as HistoryIcon,
-  ExpandMore as ExpandMoreIcon,
   Check as CheckIcon,
   Close as CloseIcon,
   Shield as ShieldIcon,
@@ -55,11 +46,10 @@ import {
   LockOpen as LockOpenIcon,
   AdminPanelSettings as AdminIcon,
 } from '@mui/icons-material'
-import { api } from '../api'
+import api from '../api'
 import {
   Role,
   UserWithPrivileges,
-  Permission,
   AuditLog,
   PermissionRequest,
   USER_ROLES,
@@ -91,7 +81,6 @@ export default function Privilegios() {
   const [users, setUsers] = useState<UserWithPrivileges[]>([])
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
   const [requests, setRequests] = useState<PermissionRequest[]>([])
-  const [loading, setLoading] = useState(false)
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',
@@ -99,11 +88,9 @@ export default function Privilegios() {
   })
 
   // Dialogs
-  const [roleDialog, setRoleDialog] = useState(false)
   const [userRoleDialog, setUserRoleDialog] = useState(false)
   const [permissionDialog, setPermissionDialog] = useState(false)
   const [selectedUser, setSelectedUser] = useState<UserWithPrivileges | null>(null)
-  const [selectedRole, setSelectedRole] = useState<Partial<Role>>({})
   const [newRole, setNewRole] = useState<UserRole>('publicador')
   const [newPermission, setNewPermission] = useState<{ resource: Resource; action: Action }>({
     resource: 'publicadores',
@@ -115,7 +102,6 @@ export default function Privilegios() {
   }, [])
 
   const loadData = async () => {
-    setLoading(true)
     try {
       const [rolesRes, usersRes, auditRes, requestsRes] = await Promise.all([
         api.get('/privilegios/roles'),
@@ -129,8 +115,6 @@ export default function Privilegios() {
       setRequests(requestsRes.data.solicitacoes || [])
     } catch (error: any) {
       showSnackbar('Erro ao carregar dados: ' + (error.response?.data?.error || error.message), 'error')
-    } finally {
-      setLoading(false)
     }
   }
 
