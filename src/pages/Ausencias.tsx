@@ -53,8 +53,6 @@ import type { Publicador, Ausencia, TipoAusencia, DiaSemana, TipoDesignacaoAusen
 import { DIAS_SEMANA, TIPOS_DESIGNACAO_AUSENCIA, PRIVILEGIOS } from '../types'
 
 // Utilitários
-const generateId = () => Math.random().toString(36).substr(2, 9)
-
 const formatDate = (date: Date): string => date.toISOString().split('T')[0]
 
 const formatDateDisplay = (dateStr: string): string => {
@@ -63,60 +61,10 @@ const formatDateDisplay = (dateStr: string): string => {
   return date.toLocaleDateString('pt-PT', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-// Dados de exemplo para demonstração
-const AUSENCIAS_EXEMPLO: Ausencia[] = [
-  {
-    id: '1',
-    publicadorId: 'pub1',
-    publicadorNome: 'Anabela D. C. M. Almeida',
-    tipo: 'dias_especificos',
-    diasEspecificos: ['2026-03-31', '2026-04-01', '2026-04-02'],
-    tiposDesignacao: ['todas'],
-    notas: 'Viagem de família',
-    criadoEm: '2026-03-15T10:00:00Z',
-    atualizadoEm: '2026-03-15T10:00:00Z',
-  },
-  {
-    id: '2',
-    publicadorId: 'pub2',
-    publicadorNome: 'António A. Fernandes',
-    tipo: 'periodo',
-    dataInicio: '2026-04-07',
-    dataFim: '2026-04-14',
-    tiposDesignacao: ['todas'],
-    notas: 'Férias',
-    criadoEm: '2026-03-10T14:30:00Z',
-    atualizadoEm: '2026-03-10T14:30:00Z',
-  },
-  {
-    id: '3',
-    publicadorId: 'pub3',
-    publicadorNome: 'Moisés C. Fonseca',
-    tipo: 'recorrente',
-    diasSemana: ['quarta'],
-    recorrenciaInicio: '2026-01-01',
-    recorrenciaFim: '2026-12-31',
-    tiposDesignacao: ['reuniao_meio_semana'],
-    notas: 'Curso à noite às quartas',
-    criadoEm: '2026-01-05T09:00:00Z',
-    atualizadoEm: '2026-01-05T09:00:00Z',
-  },
-  {
-    id: '4',
-    publicadorId: 'pub4',
-    publicadorNome: 'Maria S. Costa',
-    tipo: 'dias_especificos',
-    diasEspecificos: ['2026-04-04'],
-    tiposDesignacao: ['testemunho_publico'],
-    notas: 'Disponível apenas para reunião',
-    criadoEm: '2026-03-20T11:00:00Z',
-    atualizadoEm: '2026-03-20T11:00:00Z',
-  },
-]
-
 export default function Ausencias() {
   // State
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [publicadores, setPublicadores] = useState<Publicador[]>([])
   const [ausencias, setAusencias] = useState<Ausencia[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -169,16 +117,15 @@ export default function Ausencias() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const pubRes = await api.get('/publicadores').catch(() => ({ data: { publicadores: [] } }))
+      const [pubRes, ausRes] = await Promise.all([
+        api.get('/publicadores').catch(() => ({ data: { publicadores: [] } })),
+        api.get('/ausencias').catch(() => ({ data: { ausencias: [] } }))
+      ])
       setPublicadores(pubRes.data.publicadores || [])
-      
-      // Por enquanto usar dados de exemplo
-      // Em produção, buscar da API: const ausRes = await api.get('/ausencias')
-      setAusencias(AUSENCIAS_EXEMPLO)
+      setAusencias(ausRes.data.ausencias || [])
     } catch (err) {
       console.error('Erro ao carregar dados:', err)
-      // Usar dados de exemplo em caso de erro
-      setAusencias(AUSENCIAS_EXEMPLO)
+      setSnackbar({ message: 'Erro ao carregar dados', type: 'error' })
     } finally {
       setLoading(false)
     }
@@ -250,46 +197,77 @@ export default function Ausencias() {
   }
 
   // Salvar ausência
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.publicadorId) {
       setSnackbar({ message: 'Selecione um publicador', type: 'error' })
       return
     }
 
-    const now = new Date().toISOString()
-    const newAusencia: Ausencia = {
-      id: editingAusencia?.id || generateId(),
-      publicadorId: formData.publicadorId,
-      publicadorNome: formData.publicadorNome,
-      tipo: formData.tipo,
-      dataInicio: formData.tipo === 'periodo' ? formData.dataInicio : undefined,
-      dataFim: formData.tipo === 'periodo' ? formData.dataFim : undefined,
-      diasEspecificos: formData.tipo === 'dias_especificos' ? formData.diasEspecificos : undefined,
-      diasSemana: formData.tipo === 'recorrente' ? formData.diasSemana : undefined,
-      recorrenciaInicio: formData.tipo === 'recorrente' ? formData.recorrenciaInicio : undefined,
-      recorrenciaFim: formData.tipo === 'recorrente' ? formData.recorrenciaFim : undefined,
-      tiposDesignacao: formData.tiposDesignacao,
-      notas: formData.notas || undefined,
-      criadoEm: editingAusencia?.criadoEm || now,
-      atualizadoEm: now,
+    // Validar baseado no tipo
+    if (formData.tipo === 'periodo' && (!formData.dataInicio || !formData.dataFim)) {
+      setSnackbar({ message: 'Preencha a data de início e fim', type: 'error' })
+      return
+    }
+    if (formData.tipo === 'dias_especificos' && formData.diasEspecificos.length === 0) {
+      setSnackbar({ message: 'Selecione pelo menos um dia', type: 'error' })
+      return
+    }
+    if (formData.tipo === 'recorrente' && formData.diasSemana.length === 0) {
+      setSnackbar({ message: 'Selecione pelo menos um dia da semana', type: 'error' })
+      return
     }
 
-    if (editingAusencia) {
-      setAusencias(prev => prev.map(a => a.id === editingAusencia.id ? newAusencia : a))
-      setSnackbar({ message: 'Ausência atualizada com sucesso', type: 'success' })
-    } else {
-      setAusencias(prev => [...prev, newAusencia])
-      setSnackbar({ message: 'Ausência criada com sucesso', type: 'success' })
-    }
+    setSaving(true)
+    try {
+      const now = new Date().toISOString()
+      const newAusencia: Ausencia = {
+        id: editingAusencia?.id || '',
+        publicadorId: formData.publicadorId,
+        publicadorNome: formData.publicadorNome,
+        tipo: formData.tipo,
+        dataInicio: formData.tipo === 'periodo' ? formData.dataInicio : undefined,
+        dataFim: formData.tipo === 'periodo' ? formData.dataFim : undefined,
+        diasEspecificos: formData.tipo === 'dias_especificos' ? formData.diasEspecificos : undefined,
+        diasSemana: formData.tipo === 'recorrente' ? formData.diasSemana : undefined,
+        recorrenciaInicio: formData.tipo === 'recorrente' ? formData.recorrenciaInicio : undefined,
+        recorrenciaFim: formData.tipo === 'recorrente' ? formData.recorrenciaFim : undefined,
+        tiposDesignacao: formData.tiposDesignacao,
+        notas: formData.notas || undefined,
+        criadoEm: editingAusencia?.criadoEm || now,
+        atualizadoEm: now,
+      }
 
-    setDialogOpen(false)
+      if (editingAusencia) {
+        await api.put(`/ausencias/${editingAusencia.id}`, newAusencia)
+        setAusencias(prev => prev.map(a => a.id === editingAusencia.id ? { ...newAusencia, id: editingAusencia.id } : a))
+        setSnackbar({ message: 'Ausência atualizada com sucesso', type: 'success' })
+      } else {
+        const response = await api.post('/ausencias', newAusencia)
+        const savedAusencia = response.data
+        setAusencias(prev => [...prev, savedAusencia])
+        setSnackbar({ message: 'Ausência criada com sucesso', type: 'success' })
+      }
+
+      setDialogOpen(false)
+    } catch (err: any) {
+      console.error('Erro ao salvar:', err)
+      setSnackbar({ message: err.response?.data?.error || 'Erro ao salvar ausência', type: 'error' })
+    } finally {
+      setSaving(false)
+    }
   }
 
   // Excluir ausência
-  const handleDelete = (id: string) => {
-    setAusencias(prev => prev.filter(a => a.id !== id))
-    setDeleteConfirm(null)
-    setSnackbar({ message: 'Ausência removida', type: 'success' })
+  const handleDelete = async (id: string) => {
+    try {
+      await api.delete(`/ausencias/${id}`)
+      setAusencias(prev => prev.filter(a => a.id !== id))
+      setDeleteConfirm(null)
+      setSnackbar({ message: 'Ausência removida com sucesso', type: 'success' })
+    } catch (err: any) {
+      console.error('Erro ao excluir:', err)
+      setSnackbar({ message: 'Erro ao excluir ausência', type: 'error' })
+    }
   }
 
   // Toggle dia no calendário
@@ -976,14 +954,14 @@ export default function Ausencias() {
           <Button 
             variant="contained" 
             onClick={handleSave}
-            disabled={!formData.publicadorId || 
+            disabled={saving || !formData.publicadorId || 
               (formData.tipo === 'periodo' && (!formData.dataInicio || !formData.dataFim)) ||
               (formData.tipo === 'dias_especificos' && formData.diasEspecificos.length === 0) ||
               (formData.tipo === 'recorrente' && formData.diasSemana.length === 0) ||
               formData.tiposDesignacao.length === 0
             }
           >
-            {editingAusencia ? 'Guardar' : 'Criar Ausência'}
+            {saving ? 'Salvando...' : editingAusencia ? 'Guardar' : 'Criar Ausência'}
           </Button>
         </DialogActions>
       </Dialog>
