@@ -668,7 +668,7 @@ function gerarDesignacoesAV(
   // Indicadores
   for (let i = 0; i < avConfig.numeroIndicadores; i++) {
     const etiqueta = avConfig.etiquetasIndicador[i]?.label || `Indicador ${i + 1}`
-    const tipo: TipoDesignacaoAV = `indicador_${(i + 1) as 1 | 2}`
+    const tipo = `indicador_${i + 1}` as TipoDesignacaoAV
 
     // Meio de semana
     const sugestoes = gerarSugestoes(
