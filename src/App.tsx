@@ -51,6 +51,7 @@ import ExportarDados from './pages/ExportarDados'
 import Programacao from './pages/Programacao'
 import Ausencias from './pages/Ausencias'
 
+
 const drawerWidth = 260
 
 interface User {
@@ -123,6 +124,7 @@ function App() {
       submenu: [
         { id: 'reuniao-semana', label: 'Reunião de Semana', icon: <EventIcon /> },
         { id: 'ausencias', label: 'Ausências', icon: <BlockIcon /> },
+        { id: 'config-programacao', label: 'Configurações', icon: <SettingsIcon /> },
       ]
     },
     { 
@@ -214,6 +216,8 @@ function App() {
         return <Programacao />
       case 'ausencias':
         return <Ausencias />
+      case 'config-programacao':
+        return <Configuracoes />
       case 'estatisticas':
         return <Estatisticas />
       case 'semanas':
