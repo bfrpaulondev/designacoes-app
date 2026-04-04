@@ -12,6 +12,16 @@
     { "source": "/api/designacoes/:id*", "destination": "/api/designacoes" },
     { "source": "/api/config-programacao", "destination": "/api/config-programacao" },
     { "source": "/api/config", "destination": "/api/config" },
+    { "source": "/api/semanas", "destination": "/api/semanas" },
+    { "source": "/api/semanas/:id*", "destination": "/api/semanas" },
+    { "source": "/api/relatorios", "destination": "/api/relatorios" },
+    { "source": "/api/relatorios/:id*", "destination": "/api/relatorios" },
+    { "source": "/api/familias", "destination": "/api/familias" },
+    { "source": "/api/familias/:id*", "destination": "/api/familias" },
+    { "source": "/api/etiquetas", "destination": "/api/etiquetas" },
+    { "source": "/api/etiquetas/:id*", "destination": "/api/etiquetas" },
+    { "source": "/api/privilegios/:path*", "destination": "/api/privilegios" },
+    { "source": "/api/qualificacoes/:path*", "destination": "/api/qualificacoes" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

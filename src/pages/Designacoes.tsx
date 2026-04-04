@@ -188,6 +188,7 @@ export default function Designacoes() {
         ...novaEscala.meioSemana,
         ...novaEscala.avIndicadores,
         ...novaEscala.limpeza,
+        ...novaEscala.testemunhoPublico,
       ]
 
       // Salva no backend

@@ -13,6 +13,7 @@ import {
   DesignacaoMeioSemana,
   DesignacaoAV,
   DesignacaoLimpeza,
+  DesignacaoTestemunho,
   SugestaoDesignacao,
   ResultadoVerificacao,
   TipoDesignacao,
@@ -21,6 +22,7 @@ import {
   TipoDesignacaoMeioSemana,
   TipoDesignacaoAV,
   TipoDesignacaoLimpeza,
+  TipoDesignacaoTestemunho,
   tipoDesignacaoParaAusencia,
 } from '../types/designacoes'
 import {
@@ -252,7 +254,7 @@ export function gerarSugestoes(
 
     sugestoes.push({
       publicadorId: publicador.id,
-      publicadorNome: publicador.nome,
+      publicadorNome: publicador.nomeCompleto || publicador.nome,
       privilegio: publicador.privilegioServico,
       tipoPublicador: publicador.tipoPublicador,
       grupoCampo: publicador.grupoCampo,
@@ -407,6 +409,7 @@ export function gerarEscalaSemanal(
   meioSemana: DesignacaoMeioSemana[]
   avIndicadores: DesignacaoAV[]
   limpeza: DesignacaoLimpeza[]
+  testemunhoPublico: DesignacaoTestemunho[]
 } {
   const dataFimSemana = new Date(dataInicio)
   dataFimSemana.setDate(dataFimSemana.getDate() + 6) // Domingo
@@ -467,7 +470,15 @@ export function gerarEscalaSemanal(
     designacoesExistentes
   )
 
-  return { fimSemana, meioSemana, avIndicadores, limpeza }
+  // Gera designações de testemunho público
+  const testemunhoPublico: DesignacaoTestemunho[] = gerarDesignacoesTestemunho(
+    config,
+    publicadores,
+    ausencias,
+    designacoesExistentes
+  )
+
+  return { fimSemana, meioSemana, avIndicadores, limpeza, testemunhoPublico }
 }
 
 function gerarDesignacoesFimSemana(
@@ -783,4 +794,94 @@ function gerarDesignacoesLimpeza(
   return designacoes
 }
 
+function gerarDesignacoesTestemunho(
+  config: ConfiguracoesSistema,
+  publicadores: Publicador[],
+  ausencias: Ausencia[],
+  designacoesExistentes: Designacao[]
+): DesignacaoTestemunho[] {
+  const designacoes: DesignacaoTestemunho[] = []
+  const horarios = config.horarios.horariosTestemunhoPublico
 
+  if (!horarios || horarios.length === 0) {
+    return designacoes
+  }
+
+  for (const horario of horarios) {
+    // Calcula a data do próximo dia configurado (sábado ou domingo)
+    const hoje = new Date()
+    const diaSemanaAtual = hoje.getDay() // 0=domingo, 6=sábado
+    let diasAte = 0
+    if (horario.dia === 'sabado') {
+      diasAte = (6 - diaSemanaAtual + 7) % 7
+      if (diasAte === 0) diasAte = 7 // Próximo sábado, não hoje se já passou
+    } else {
+      diasAte = (7 - diaSemanaAtual + 7) % 7
+      if (diasAte === 0) diasAte = 7
+    }
+
+    const data = new Date(hoje)
+    data.setDate(data.getDate() + diasAte)
+    const dataStr = data.toISOString().split('T')[0]
+
+    // Designação de manhã
+    const tipoManha: TipoDesignacaoTestemunho = `testemunho_${horario.dia}_manha` as TipoDesignacaoTestemunho
+    const sugestoesManha = gerarSugestoes(
+      publicadores,
+      dataStr,
+      tipoManha,
+      'testemunho_publico',
+      ausencias,
+      designacoesExistentes,
+      config
+    )
+
+    const sugestaoManha = sugestoesManha.find(s => s.disponivel && s.adequado)
+    if (sugestaoManha) {
+      designacoes.push({
+        id: `${dataStr}_testemunho_${horario.dia}_manha`,
+        publicadorId: sugestaoManha.publicadorId,
+        publicadorNome: sugestaoManha.publicadorNome,
+        tipo: tipoManha,
+        categoria: 'testemunho_publico',
+        data: dataStr,
+        horaInicio: horario.horaInicio,
+        horaFim: horario.horaFim,
+        status: 'pendente',
+        criadoEm: new Date().toISOString(),
+        atualizadoEm: new Date().toISOString(),
+      })
+    }
+
+    // Designação de tarde
+    const tipoTarde: TipoDesignacaoTestemunho = `testemunho_${horario.dia}_tarde` as TipoDesignacaoTestemunho
+    const sugestoesTarde = gerarSugestoes(
+      publicadores,
+      dataStr,
+      tipoTarde,
+      'testemunho_publico',
+      ausencias,
+      designacoesExistentes,
+      config
+    )
+
+    const sugestaoTarde = sugestoesTarde.find(s => s.disponivel && s.adequado)
+    if (sugestaoTarde) {
+      designacoes.push({
+        id: `${dataStr}_testemunho_${horario.dia}_tarde`,
+        publicadorId: sugestaoTarde.publicadorId,
+        publicadorNome: sugestaoTarde.publicadorNome,
+        tipo: tipoTarde,
+        categoria: 'testemunho_publico',
+        data: dataStr,
+        horaInicio: horario.horaInicio,
+        horaFim: horario.horaFim,
+        status: 'pendente',
+        criadoEm: new Date().toISOString(),
+        atualizadoEm: new Date().toISOString(),
+      })
+    }
+  }
+
+  return designacoes
+}
